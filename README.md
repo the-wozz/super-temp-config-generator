@@ -9,5 +9,5 @@ Parameter 6: Targeted macOS version | minor or major target<br>
 Parameter 7: Verbose mode to show more information in logs | 1 - Enabled 0 - Disabled<br>
 <br>
 <br>
-To use SUPER Temp Config File settings:
+To use SUPER Temp Config File settings:<br>
 sudo super --config-start-temp=TEMPCONFIGNAMEHERE
