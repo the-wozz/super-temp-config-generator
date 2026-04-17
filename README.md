@@ -7,3 +7,7 @@ Parameter 4: Temporary Config Name, this is the name of the temporary config fil
 Parameter 5: allow macOS upgrades | true or false<br>
 Parameter 6: Targeted macOS version | minor or major target<br>
 Parameter 7: Verbose mode to show more information in logs | 1 - Enabled 0 - Disabled<br>
+<br>
+<br>
+To use SUPER Temp Config File settings:
+sudo super --config-start-temp=TEMPCONFIGNAMEHERE
