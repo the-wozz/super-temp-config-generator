@@ -3,17 +3,20 @@
 # Author: Zachary 'Woz'nicki
 # What it do: Creates a temporary SUPER config file with customizable parameters.
 # Requirements: SUPER 5.1.0-rc1 minimum
+# version 1.1 - added allowUpgrades variable which also changes key information in plist generation
 sDate=4/17/26
-sVersion=1.0
+sVersion=1.1
 sTitle="Super Temp Config Generator"
 
 # Modfiable Variables
 # Temporary Config Name, set as Jamf Pro script Parameter 4 in Options!
 tempConfigName=$4
-# Targeted macOS version, set as Jamf Pro script Parameter 5 in Options!
-macOSVersionTarget=$5
+# allow macOS upgrades | true or false , set as Jamf Pro script Parameter 5 in Options!
+allowUpgrades=$5
+# Targeted macOS version, set as Jamf Pro script Parameter 6 in Options!
+macOSVersionTarget=$6
 # Verbose mode to show more information in logs| 1 - Enabled 0 - Disabled
-verboseMode=$6;if [ $verboseMode -eq 1 ]; then /bin/echo "VERBOSE MODE ENABLED";fi
+verboseMode=$7;if [ $verboseMode -eq 1 ]; then /bin/echo "VERBOSE MODE ENABLED";fi
 # DO NOT TOUCH VARS
 tempConfigFullName=com.macjutsu.super.$tempConfigName.plist
 superconfigsFolder=/Library/Management/super/configs
@@ -37,12 +40,22 @@ superVersion=$(/usr/bin/defaults read /Library/Management/super/com.macjutsu.sup
             exit 1
     fi
 
+# evaluate allowUpgrades variable processing
+/bin/echo "Checking 'allowUpgrades variable..."
+    if [ "$allowUpgrades" == "true" ]; then
+        /bin/echo "Setting upgradeType to: InstallMacOSMajorVersionTarget"
+        updateType=InstallMacOSMajorVersionTarget
+    else
+        /bin/echo "Setting upgradeType to: InstallMacOSMinorVersionTarget"
+        updateType=InstallMacOSMinorVersionTarget
+    fi
+
 # Check if prior temp config file exists with the same name, delete if so
 /bin/echo "Checking if prior $tempConfigFullName already exists..."
-if [ -e "$superconfigsFolder/$tempConfigFullName" ]; then
-    /bin/echo "FOUND: $superconfigsFolder/$tempConfigFullName. Deleting..."
-        /bin/rm -rf $superconfigsFolder/$tempConfigFullName
-fi
+    if [ -e "$superconfigsFolder/$tempConfigFullName" ]; then
+        /bin/echo "FOUND: $superconfigsFolder/$tempConfigFullName. Deleting..."
+            /bin/rm -rf $superconfigsFolder/$tempConfigFullName
+    fi
 
 # Create our temporary SUPER conifg
 /bin/echo "Creating temporary config file [$superconfigsFolder/$tempConfigFullName]"
@@ -63,8 +76,8 @@ fi
     <key>ConfigTempOverride</key>
     <true/>
     <key>InstallMacOSMajorUpgrades</key>
-    <true/>
-    <key>InstallMacOSMajorVersionTarget</key>
+    <$allowUpgrades/>
+    <key>$updateType</key>
     <string>$macOSVersionTarget</string>
   </dict>
 </plist>
